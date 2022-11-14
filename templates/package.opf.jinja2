@@ -3,7 +3,7 @@
     <metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
         <dc:title>{{ name }}</dc:title>
         <dc:language>en-US</dc:language>
-        <dc:creator>ePub Creator</dc:creator>
+        <dc:creator>{{ author }}</dc:creator>
         <dc:identifier id="BookID" opf:scheme="UUID">{{ uuid }}</dc:identifier>
         <meta property="rendition:layout">pre-paginated</meta>
         <meta property="rendition:orientation">auto</meta>
@@ -23,9 +23,9 @@
         <item id="toc" properties="nav" href="toc.xhtml" media-type="application/xhtml+xml"/>
         <item id="ncxtoc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
     </manifest>
-    <spine toc="ncxtoc" page-progression-direction="rtl">
+    <spine toc="ncxtoc" {{'page-progression-direction="rtl"' if right_to_left}}>
         {%- for image in images %}
-        <itemref idref="{{- image.id -}} {%- if wrap_pages -%} _wrapper {%- endif -%}" />
+        <itemref idref="{{- image.id -}} {%- if wrap_pages -%} _wrapper {%- endif -%}" {% if image.is_cover %} properties="rendition:page-spread-center" {% else %} properties="{{ loop.cycle('page-spread-left', 'page-spread-right') }}" {% endif %}/>
         {%- endfor %}
     </spine>
 </package>

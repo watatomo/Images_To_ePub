@@ -42,6 +42,9 @@ if __name__ == '__main__':
         '-n', '--name', dest='name', default='', metavar='NAME', help='NAME of the book'
     )
     parser.add_option(
+        '-a', '--author', dest='author', default='', metavar='AUTHOR', help='AUTHOR of the book'
+    )
+    parser.add_option(
         '-g', '--grayscale', dest='grayscale', default=False, action='store_true',
         help="Convert all images to black and white before adding them to the ePub.",
     )
@@ -61,10 +64,15 @@ if __name__ == '__main__':
         '--no-wrap-pages', dest='no_wrap_pages', action='store_true',
         help="Do not wrap the pages in a separate file. Results will vary for each reader."
     )
+    parser.add_option(
+        '--right-to-left', dest='right_to_left', action='store_true',
+        help="Set the ePub to read from right to left instead of left to right."
+    )
     (options, args) = parser.parse_args()
 
     if options.wrap_pages and options.no_wrap_pages:
-        parser.error("options --wrap-pages and --no-wrap-pages are mutually exclusive")
+        parser.error(
+            "options --wrap-pages and --no-wrap-pages are mutually exclusive")
 
     if not options.input_dir and not options.file and not options.name:
         if not all(os.path.isdir(elem) for elem in args):
@@ -76,31 +84,35 @@ if __name__ == '__main__':
             if not path.is_dir():
                 parser.error(f"The following path is not a directory: {path}")
             if not path.name:
-                parser.error(f"Could not get the name of the directory: {path}")
+                parser.error(
+                    f"Could not get the name of the directory: {path}")
             directories.append(path)
 
         for path in directories:
             EPubMaker(
                 master=None, input_dir=path, file=path.parent.joinpath(path.name + '.epub'), name=path.name or "Output",
                 grayscale=options.grayscale, max_width=options.max_width, max_height=options.max_height,
-                progress=CmdProgress(options.progress), wrap_pages=not options.no_wrap_pages
+                progress=CmdProgress(options.progress), wrap_pages=not options.no_wrap_pages,
+                right_to_left=options.right_to_left
             ).run()
     elif options.input_dir and options.file and options.name:
         if options.cmd:
             if args or not options.input_dir or not options.file or not options.name:
-                parser.error("The '--dir', '--file', and '--name' arguments are required.")
+                parser.error(
+                    "The '--dir', '--file', '--name', and '--author' arguments are required.")
 
             EPubMaker(
-                master=None, input_dir=options.input_dir, file=options.file, name=options.name,
+                master=None, input_dir=options.input_dir, file=options.file, name=options.name, author=options.author,
                 grayscale=options.grayscale, max_width=options.max_width,
-                max_height=options.max_height, progress=CmdProgress(options.progress),
-                wrap_pages=not options.no_wrap_pages
+                max_height=options.max_height, progress=CmdProgress(
+                    options.progress),
+                wrap_pages=not options.no_wrap_pages, right_to_left=options.right_to_left
             ).run()
         else:
             import _Gui
 
-            _Gui.start_gui(input_dir=options.input_dir, file=options.file, name=options.name,
+            _Gui.start_gui(input_dir=options.input_dir, file=options.file, name=options.name, author=options.author,
                            grayscale=options.grayscale, max_width=options.max_width, max_height=options.max_height,
-                           wrap_pages=not options.no_wrap_pages)
+                           wrap_pages=not options.no_wrap_pages, right_to_left=options.right_to_left)
     else:
         parser.print_help()
