@@ -45,6 +45,9 @@ if __name__ == '__main__':
         '-a', '--author', dest='author', default='', metavar='AUTHOR', help='AUTHOR of the book'
     )
     parser.add_option(
+        '-p', '--publisher', dest='publisher', default='', metavar='PUBLISHER', help='PUBLISHER of the book'
+    )
+    parser.add_option(
         '-g', '--grayscale', dest='grayscale', default=False, action='store_true',
         help="Convert all images to black and white before adding them to the ePub.",
     )
@@ -91,7 +94,7 @@ if __name__ == '__main__':
         for path in directories:
             EPubMaker(
                 master=None, input_dir=path, file=path.parent.joinpath(path.name + '.epub'), name=path.name or "Output",
-                grayscale=options.grayscale, max_width=options.max_width, max_height=options.max_height,
+                author=options.author, publisher=options.publisher, grayscale=options.grayscale, max_width=options.max_width, max_height=options.max_height,
                 progress=CmdProgress(options.progress), wrap_pages=not options.no_wrap_pages,
                 right_to_left=options.right_to_left
             ).run()
@@ -103,7 +106,7 @@ if __name__ == '__main__':
 
             EPubMaker(
                 master=None, input_dir=options.input_dir, file=options.file, name=options.name, author=options.author,
-                grayscale=options.grayscale, max_width=options.max_width,
+                publisher=options.publisher, grayscale=options.grayscale, max_width=options.max_width,
                 max_height=options.max_height, progress=CmdProgress(
                     options.progress),
                 wrap_pages=not options.no_wrap_pages, right_to_left=options.right_to_left
@@ -112,7 +115,7 @@ if __name__ == '__main__':
             import _Gui
 
             _Gui.start_gui(input_dir=options.input_dir, file=options.file, name=options.name, author=options.author,
-                           grayscale=options.grayscale, max_width=options.max_width, max_height=options.max_height,
+                           publisher=options.publisher, grayscale=options.grayscale, max_width=options.max_width, max_height=options.max_height,
                            wrap_pages=not options.no_wrap_pages, right_to_left=options.right_to_left)
     else:
         parser.print_help()

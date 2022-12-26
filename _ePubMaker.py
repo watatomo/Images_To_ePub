@@ -30,7 +30,8 @@ from zipfile import ZipFile, ZIP_STORED, ZIP_DEFLATED
 import PIL.Image
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
-MEDIA_TYPES = {'.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif'}
+MEDIA_TYPES = {'.png': 'image/png', '.jpg': 'image/jpeg',
+               '.gif': 'image/gif', '.jpeg': 'image/jpeg'}
 TEMPLATE_DIR = Path(__file__).parent.joinpath("templates")
 
 
@@ -76,7 +77,7 @@ class Chapter:
 
 
 class EPubMaker(threading.Thread):
-    def __init__(self, master, input_dir, file, name, author, wrap_pages, grayscale, max_width, max_height, right_to_left, progress=None):
+    def __init__(self, master, input_dir, file, name, author, publisher, wrap_pages, grayscale, max_width, max_height, right_to_left, progress=None):
         threading.Thread.__init__(self)
         self.master = master
         self.progress = None
@@ -88,6 +89,7 @@ class EPubMaker(threading.Thread):
         self.file = file
         self.name = name
         self.author = author
+        self.publisher = publisher
         self.picture_at = 1
         self.stop_event = False
 
@@ -241,7 +243,7 @@ class EPubMaker(threading.Thread):
     def write_template(self, name, *, out=None, data=None):
         out = out or name
         data = data or {
-            "name": self.name, "author": self.author, "uuid": self.uuid, "cover": self.cover, "chapter_tree": self.chapter_tree,
+            "name": self.name, "author": self.author, "publisher": self.publisher, "uuid": self.uuid, "cover": self.cover, "chapter_tree": self.chapter_tree,
             "images": self.images, "wrap_pages": self.wrap_pages, "right_to_left": self.right_to_left
         }
         self.zip.writestr(out, self.template_env.get_template(

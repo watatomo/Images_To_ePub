@@ -39,9 +39,8 @@ def validate(condition, entry, result):
 
 
 class MainFrame(tk.Frame):
-    def __init__(self, _master, input_dir=None, file=None, name="", author="", grayscale=False, max_width=None, max_height=None,
-                 wrap_pages=True, right_to_left=False):
-        tk.Frame.__init__(self, master=_master, width=525, height=230)
+    def __init__(self, _master, input_dir=None, file=None, name="", author="", publisher="", grayscale=False, max_width=None, max_height=None, wrap_pages=True, right_to_left=False):
+        tk.Frame.__init__(self, master=_master, width=525, height=275)
         self.master.protocol("WM_DELETE_WINDOW", self.close)
         self.generic_queue = Queue()
         self.progress_queue = Queue()
@@ -106,9 +105,19 @@ class MainFrame(tk.Frame):
         self.author_entry.config(width=40)
         self.author_entry.grid(row=0, column=1, padx=5)
 
+        # publisher
+        publisher_frame = tk.Frame(panel)
+        publisher_frame.grid(row=4, column=0, columnspan=2, pady=3)
+        tk.Label(publisher_frame, text="Publisher:").grid(row=0, column=0)
+        self.publisher = tk.StringVar(value=publisher)
+        self.publisher_entry = tk.Entry(
+            publisher_frame, textvariable=self.publisher, validate="key")
+        self.publisher_entry.config(width=40)
+        self.publisher_entry.grid(row=0, column=1, padx=5)
+
         # image size
         size_frame = tk.Frame(panel)
-        size_frame.grid(row=4, column=0, columnspan=2, pady=3)
+        size_frame.grid(row=5, column=0, columnspan=2, pady=3)
         tk.Label(size_frame, text="Maximum width: ").grid(row=0, column=0)
         self.max_width = tk.StringVar(value=max_width)
         self.max_width_entry = tk.Entry(
@@ -124,7 +133,7 @@ class MainFrame(tk.Frame):
 
         # options
         options_frame = tk.Frame(panel)
-        options_frame.grid(row=5, column=0, columnspan=3, pady=3)
+        options_frame.grid(row=6, column=0, columnspan=3, pady=3)
         self.grayscale = tk.BooleanVar(value=grayscale)
         self.grayscale_entry = tk.Checkbutton(
             options_frame, text="Grayscale", variable=self.grayscale)
@@ -140,7 +149,7 @@ class MainFrame(tk.Frame):
 
         # progress
         progress = tk.Frame(panel)
-        progress.grid(row=6, column=0, columnspan=2, pady=3)
+        progress.grid(row=7, column=0, columnspan=2, pady=3)
         self.button_start = tk.Button(
             progress, text="Start", command=self.start)
         self.button_start.config(width=10)
@@ -179,6 +188,7 @@ class MainFrame(tk.Frame):
             validate(self.file, self.file_entry, "ouput file"),
             validate(self.name.get(), self.name_entry, "name"),
             validate(self.author.get(), self.author_entry, "author"),
+            validate(self.publisher.get(), self.publisher_entry, "publisher"),
             validate(not max_width or max_width.isnumeric(),
                      self.max_width_entry, "maximum width"),
             validate(not max_height or max_height.isnumeric(),
@@ -192,6 +202,7 @@ class MainFrame(tk.Frame):
         self.button_file.config(state=state)
         self.name_entry.config(state=state)
         self.author_entry.config(state=state)
+        self.publisher_entry.config(state=state)
         self.grayscale_entry.config(state=state)
         self.wrap_pages_entry.config(state=state)
         self.max_width_entry.config(state=state)
@@ -209,7 +220,7 @@ class MainFrame(tk.Frame):
             max_width, max_height = self.max_width.get(), self.max_height.get()
             self.thread = EPubMaker(
                 master=self, input_dir=self.input_dir, file=self.file, name=self.name.get(), author=self.author.get(),
-                wrap_pages=self.wrap_pages.get(), max_width=int(max_width) if max_width else None,
+                publisher=self.publisher.get(), wrap_pages=self.wrap_pages.get(), max_width=int(max_width) if max_width else None,
                 max_height=int(max_height) if max_height else None, grayscale=self.grayscale.get(),
                 right_to_left=self.right_to_left.get()
             )
@@ -264,10 +275,10 @@ class MainFrame(tk.Frame):
         self.after(UPDATE_TIME, self.process_queue)
 
 
-def start_gui(input_dir=None, file=None, name="", author="", grayscale=False, max_width=None, max_height=None, wrap_pages=True):
+def start_gui(input_dir=None, file=None, name="", author="", publisher="", grayscale=False, max_width=None, max_height=None, wrap_pages=True):
     root = tk.Tk()
     MainFrame(
-        root, input_dir=input_dir, file=file, name=name, author=author, grayscale=grayscale, max_width=max_width,
+        root, input_dir=input_dir, file=file, name=name, author=author, publisher=publisher, grayscale=grayscale, max_width=max_width,
         max_height=max_height, wrap_pages=wrap_pages
     ).mainloop()
 
